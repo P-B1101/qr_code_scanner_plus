@@ -180,7 +180,6 @@ class _QRViewExampleState extends State<QRViewExample> {
   void _onQRViewCreated(QRViewController controller) async {
     minZoom = await controller.getMinZoomLevel();
     maxZoom = await controller.getMaxZoomLevel();
-    print('min and max is $minZoom, $maxZoom');
     setState(() {
       this.controller = controller;
     });

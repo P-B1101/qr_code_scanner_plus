@@ -214,7 +214,6 @@ class QRViewController {
   bool get hasPermissions => _hasPermissions;
   double? _maxZoom;
   double? _minZoom;
-
   /// Starts the barcode scanner
   Future<void> _startScan(GlobalKey key, QrScannerOverlayShape? overlay, List<BarcodeFormat>? barcodeFormats) async {
     // We need to update the dimension before the scan is started.
@@ -244,7 +243,7 @@ class QRViewController {
     if (_maxZoom != null) return _maxZoom!;
     await Future.delayed(const Duration(milliseconds: 500));
     _maxZoom = await _channel.invokeMethod('getMaxZoom') as double?;
-    return _maxZoom ?? await getMaxZoomLevel();
+    return getMaxZoomLevel();
   }
 
   /// Get Min zoom level of the camera
@@ -252,7 +251,7 @@ class QRViewController {
     if (_minZoom != null) return _minZoom!;
     await Future.delayed(const Duration(milliseconds: 500));
     _minZoom = await _channel.invokeMethod('getMinZoom') as double?;
-    return _minZoom ?? await getMinZoomLevel();
+    return getMinZoomLevel();
   }
 
   /// Get zoom level of the camera
