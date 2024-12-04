@@ -49,7 +49,7 @@ class CustomFramingRectBarcodeView : BarcodeView {
         private const val BOTTOM_OFFSET_NOT_SET_VALUE = -1
     }
 
-    fun setZoomLevel(zoomLevel: Int) {
+    fun setZoomLevel(zoomLevel: Double) {
         val camera = cameraInstance ?: return
         camera.changeCameraParameters { params: Camera.Parameters ->
             maxZoomLevel = params.maxZoom
@@ -65,7 +65,7 @@ class CustomFramingRectBarcodeView : BarcodeView {
 
     fun getMaxZoomLevel(): Double {
         if (!isMaxLevelSet) {
-            setZoomLevel(1)
+            setZoomLevel(1.0)
         }
         return maxZoomLevel.toDouble()
     }
