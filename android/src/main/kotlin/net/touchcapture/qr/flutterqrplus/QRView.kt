@@ -104,6 +104,12 @@ class QRView(
                 isInvert = call.argument<Boolean>("isInvertScan") ?: false,
             )
 
+            "getMinZoom" -> getMinZoom(result)
+
+            "getMaxZoom" -> getMaxZoom(result)
+
+            "setZoomLevel" -> setZoomLevel(result, zoomLevel = call.argument<Float>("zoomLevel"))
+
             else -> result.notImplemented()
         }
     }
@@ -171,6 +177,24 @@ class QRView(
         } catch (e: Exception) {
             result.error("", e.message, null)
         }
+    }
+
+
+    private fun getMinZoom(result: MethodChannel.Result) {
+        val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
+        result.success(barcodeView.minZoomLevel)
+    }
+
+
+    private fun getMaxZoom(result: MethodChannel.Result) {
+        val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
+        result.success(barcodeView.maxZoomLevel)
+    }
+
+    private fun setZoomLevel(result: MethodChannel.Result, zoomLevel: Float) {
+        val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
+        barcodeView.setZoomLevel(zoomLevel)
+        result.success(true)
     }
 
     // endregion
@@ -318,7 +342,6 @@ class QRView(
 
         return permissionGranted
     }
-
 
 
     private fun checkAndRequestPermission() {

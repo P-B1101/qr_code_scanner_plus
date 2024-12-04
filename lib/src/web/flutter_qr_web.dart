@@ -34,12 +34,10 @@ class WebQrView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _WebQrViewState();
 
-  static web.HTMLDivElement vidDiv =
-      web.HTMLDivElement(); // need a global for the registerViewFactory
+  static web.HTMLDivElement vidDiv = web.HTMLDivElement(); // need a global for the registerViewFactory
 
   static Future<bool> cameraAvailable() async {
-    final sources =
-        await web.window.navigator.mediaDevices.enumerateDevices().toDart;
+    final sources = await web.window.navigator.mediaDevices.enumerateDevices().toDart;
     // List<String> vidIds = [];
     var hasCam = false;
     for (final e in sources.toDart) {
@@ -67,8 +65,7 @@ class _WebQrViewState extends State<WebQrView> {
   web.HTMLVideoElement video = web.HTMLVideoElement();
   String viewID = 'QRVIEW-${DateTime.now().millisecondsSinceEpoch}';
 
-  final StreamController<Barcode> _scanUpdateController =
-      StreamController<Barcode>();
+  final StreamController<Barcode> _scanUpdateController = StreamController<Barcode>();
   late CameraFacing facing;
 
   Timer? _frameIntervall;
@@ -84,8 +81,7 @@ class _WebQrViewState extends State<WebQrView> {
     WebQrView.vidDiv.children.add(video);
 
     // ignore: UNDEFINED_PREFIXED_NAME
-    ui.platformViewRegistry
-        .registerViewFactory(viewID, (int id) => WebQrView.vidDiv);
+    ui.platformViewRegistry.registerViewFactory(viewID, (int id) => WebQrView.vidDiv);
     // giving JavaScipt some time to process the DOM changes
     Timer(const Duration(milliseconds: 500), () {
       start();
@@ -95,8 +91,7 @@ class _WebQrViewState extends State<WebQrView> {
   Future start() async {
     await _makeCall();
     _frameIntervall?.cancel();
-    _frameIntervall =
-        Timer.periodic(const Duration(milliseconds: 200), (timer) {
+    _frameIntervall = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       _captureFrame2();
     });
   }
@@ -140,8 +135,7 @@ class _WebQrViewState extends State<WebQrView> {
       widget.onPermissionSet?.call(_controller!, true);
       _localStream = stream;
       video.srcObject = _localStream;
-      video.setAttribute('playsinline',
-          'true'); // required to tell iOS safari we don't want fullscreen
+      video.setAttribute('playsinline', 'true'); // required to tell iOS safari we don't want fullscreen
       await video.play().toDart;
     } catch (e) {
       cancel();
@@ -202,8 +196,7 @@ class _WebQrViewState extends State<WebQrView> {
       final code = jsQR(imgData.data, canvas.width, canvas.height);
       // ignore: unnecessary_null_comparison
       if (code != null && code.data != null) {
-        _scanUpdateController
-            .add(Barcode(code.data, BarcodeFormat.qrcode, code.data.codeUnits));
+        _scanUpdateController.add(Barcode(code.data, BarcodeFormat.qrcode, code.data.codeUnits));
       }
     } on NoSuchMethodError {
       // Do nothing, this exception occurs continously in web release when no
@@ -261,6 +254,7 @@ class _WebQrViewState extends State<WebQrView> {
 class QRViewControllerWeb implements QRViewController {
   final _WebQrViewState _state;
 
+  // ignore: library_private_types_in_public_api
   QRViewControllerWeb(this._state);
   @override
   void dispose() => _state.cancel();
@@ -268,9 +262,7 @@ class QRViewControllerWeb implements QRViewController {
   @override
   Future<CameraFacing> flipCamera() async {
     // TODO: improve error handling
-    _state.facing = _state.facing == CameraFacing.front
-        ? CameraFacing.back
-        : CameraFacing.front;
+    _state.facing = _state.facing == CameraFacing.front ? CameraFacing.back : CameraFacing.front;
     await _state.start();
     return _state.facing;
   }
@@ -324,15 +316,31 @@ class QRViewControllerWeb implements QRViewController {
   }
 
   @override
-  Future<void> scanInvert(bool isScanInvert) {
+  Future<void> scanInvert(bool isScanInvert) async {
     // TODO: implement scanInvert
+    return;
+  }
+
+  @override
+  Future<double> getMaxZoomLevel() async {
+    // TODO: implement getMaxZoomLevel
+    return -1;
+  }
+
+  @override
+  Future<double> getMinZoomLevel() async {
+    // TODO: implement getMinZoomLevel
+    return -1;
+  }
+
+  @override
+  Future<void> setZoomLevel(double zoomLevel) {
+    // TODO: implement setZoomLevel
     throw UnimplementedError();
   }
 }
 
-Widget createWebQrView(
-        {onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing}) =>
-    WebQrView(
+Widget createWebQrView({onPlatformViewCreated, onPermissionSet, CameraFacing? cameraFacing}) => WebQrView(
       onPlatformViewCreated: onPlatformViewCreated,
       onPermissionSet: onPermissionSet,
       cameraFacing: cameraFacing,

@@ -2,12 +2,17 @@ package net.touchcapture.qr.flutterqrplus
 
 import android.content.Context
 import android.graphics.Rect
+import android.hardware.Camera
 import android.util.AttributeSet
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.Size
+import kotlin.math.min
 
 class CustomFramingRectBarcodeView : BarcodeView {
     private var bottomOffset = BOTTOM_OFFSET_NOT_SET_VALUE
+
+    var maxZoomLevel: Float = 1.0f
+    val minZoomLevel: Float = 1.0f
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -42,4 +47,19 @@ class CustomFramingRectBarcodeView : BarcodeView {
     companion object {
         private const val BOTTOM_OFFSET_NOT_SET_VALUE = -1
     }
+
+    fun setZoomLevel(zoomLevel: Float) {
+        val camera = cameraInstance ?: return
+        camera.changeCameraParameters { params: Camera.Parameters ->
+            maxZoomLevel = params.maxZoom.toFloat()
+            if (params.isZoomSupported) {
+                val maxZoom = params.maxZoom
+                val newZoomLevel = min(maxZoom, zoomLevel.toInt())
+                params.zoom = newZoomLevel
+            }
+            params
+        }
+    }
+
+
 }
