@@ -184,18 +184,18 @@ class QRView(
 
 
     private fun getMinZoom(result: MethodChannel.Result) {
-        val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
+        val barcodeView = barcodeView ?: return
         result.success(barcodeView.getMinZoomLevel())
     }
 
 
     private fun getMaxZoom(result: MethodChannel.Result) {
-        val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
+        val barcodeView = barcodeView ?: return
         result.success(barcodeView.getMaxZoomLevel())
     }
 
     private fun setZoomLevel(result: MethodChannel.Result, zoomLevel: Double) {
-        val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
+        val barcodeView = barcodeView ?: return
         barcodeView.setZoomLevel(zoomLevel)
         result.success(true)
     }
