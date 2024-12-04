@@ -11,8 +11,9 @@ import kotlin.math.min
 class CustomFramingRectBarcodeView : BarcodeView {
     private var bottomOffset = BOTTOM_OFFSET_NOT_SET_VALUE
 
-    var maxZoomLevel: Float = 1.0f
-    val minZoomLevel: Float = 1.0f
+    val minZoomLevel: Double = 1.0
+    private var maxZoomLevel: Int = 1
+    private var isMaxLevelSet: Boolean = false
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -48,10 +49,11 @@ class CustomFramingRectBarcodeView : BarcodeView {
         private const val BOTTOM_OFFSET_NOT_SET_VALUE = -1
     }
 
-    fun setZoomLevel(zoomLevel: Float) {
+    fun setZoomLevel(zoomLevel: Int) {
         val camera = cameraInstance ?: return
         camera.changeCameraParameters { params: Camera.Parameters ->
-            maxZoomLevel = params.maxZoom.toFloat()
+            maxZoomLevel = params.maxZoom
+            isMaxLevelSet = true
             if (params.isZoomSupported) {
                 val maxZoom = params.maxZoom
                 val newZoomLevel = min(maxZoom, zoomLevel.toInt())
@@ -59,6 +61,13 @@ class CustomFramingRectBarcodeView : BarcodeView {
             }
             params
         }
+    }
+
+    fun getMaxZoomLevel(): Double {
+        if (!isMaxLevelSet) {
+            setZoomLevel(1)
+        }
+        return maxZoomLevel.toDouble()
     }
 
 

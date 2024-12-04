@@ -248,7 +248,7 @@ class QRViewController {
   /// Get zoom level of the camera
   /// Set to max zoom level if [zoomLevel] is bigger than max zoom level
   Future<void> setZoomLevel(double zoomLevel) async {
-    return await _channel.invokeMethod('setZoomLevel', [zoomLevel]);
+    return await _channel.invokeMethod('setZoomLevel', {"zoomLevel": zoomLevel});
   }
 
   /// Flips the camera between available modes
