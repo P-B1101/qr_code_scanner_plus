@@ -108,7 +108,7 @@ class QRView(
 
             "getMaxZoom" -> getMaxZoom(result)
 
-            "setZoomLevel" -> setZoomLevel(result, zoomLevel = call.argument<Float>("zoomLevel"))
+            "setZoomLevel" -> setZoomLevel(result, zoomLevel = call.argument<Float>("zoomLevel")?: 1.0f)
 
             else -> result.notImplemented()
         }
