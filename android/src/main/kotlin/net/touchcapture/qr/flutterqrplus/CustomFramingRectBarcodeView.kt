@@ -6,16 +6,24 @@ import android.hardware.Camera
 import android.util.AttributeSet
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.Size
+import kotlin.math.abs
 import kotlin.math.min
 
 class CustomFramingRectBarcodeView : BarcodeView {
     private var bottomOffset = BOTTOM_OFFSET_NOT_SET_VALUE
 
-    val minZoomLevel: Double = 1.0
-    private var maxZoomLevel: Int = 1
-    private var isMaxLevelSet: Boolean = false
+    private val minZoomIndex: Int = 0
 
-    constructor(context: Context?) : super(context)
+    private var maxZoomIndex: Int? = null
+    private var zoomLevels: List<Int>? = null
+    private var minZoom: Double? = null
+    private var maxZoom: Double? = null
+
+    constructor(context: Context?) : super(context) {
+        initializeZoom()
+
+    }
+
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
@@ -52,23 +60,60 @@ class CustomFramingRectBarcodeView : BarcodeView {
     fun setZoomLevel(zoomLevel: Double) {
         val camera = cameraInstance ?: return
         camera.changeCameraParameters { params: Camera.Parameters ->
-            maxZoomLevel = params.maxZoom
-            isMaxLevelSet = true
-            if (params.isZoomSupported) {
-                val maxZoom = params.maxZoom
-                val newZoomLevel = min(maxZoom, zoomLevel.toInt())
-                params.zoom = newZoomLevel
+            try {
+                if (params.isZoomSupported) {
+                    val zoom = findIndex(zoomLevel)
+                    if (zoom != -1) {
+                        val maxZoom = params.maxZoom
+                        val newZoomLevel = min(maxZoom, zoom)
+                        params.zoom = newZoomLevel
+                    }
+                }
+            } catch (e: Exception) {
+                print(e)
             }
             params
         }
     }
 
-    fun getMaxZoomLevel(): Double {
-        if (!isMaxLevelSet) {
-            setZoomLevel(1.0)
+    fun getMaxZoomLevel(): Double? {
+        if (zoomLevels == null) {
+            initializeZoom()
+            return null
         }
-        return maxZoomLevel.toDouble()
+        if (maxZoom != null) return maxZoom as Double
+        maxZoom = (maxZoomIndex?.let { zoomLevels?.get(it) } ?: 100) / 100.0
+        return maxZoom as Double
     }
 
+    fun getMinZoomLevel(): Double? {
+        if (zoomLevels == null) {
+            initializeZoom()
+            return null
+        }
+        if (minZoom != null) return minZoom as Double
+        minZoom = (zoomLevels?.get(minZoomIndex) ?: 100) / 100.0
+        return minZoom as Double
+    }
+
+    private fun initializeZoom() {
+        if (zoomLevels != null) return
+        cameraInstance?.changeCameraParameters { params: Camera.Parameters ->
+            maxZoomIndex = params.maxZoom
+            zoomLevels = params.zoomRatios
+            params
+        }
+    }
+
+    private fun findIndex(zoomLevel: Double): Int {
+        if (zoomLevels == null) {
+            initializeZoom()
+            return -1
+        }
+        val realValue = (zoomLevel * 100).toInt()
+        val nearValue = (zoomLevels as List<Int>).minByOrNull { abs(it - realValue) } ?: -1
+        val result = (zoomLevels as List<Int>).indexOf(nearValue)
+        return result
+    }
 
 }

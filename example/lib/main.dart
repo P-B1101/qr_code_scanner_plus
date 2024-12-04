@@ -38,6 +38,9 @@ class _QRViewExampleState extends State<QRViewExample> {
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  double zoom = 1;
+  double? maxZoom;
+  double? minZoom;
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
@@ -55,7 +58,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Expanded(flex: 4, child: _buildQrView(context)),
+          Expanded(flex: 2, child: _buildQrView(context)),
           Expanded(
             flex: 1,
             child: FittedBox(
@@ -67,6 +70,28 @@ class _QRViewExampleState extends State<QRViewExample> {
                     Text('Barcode Type: ${result!.format.name}   Data: ${result!.code}')
                   else
                     const Text('Scan a code'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: const EdgeInsets.all(8),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (maxZoom == null || maxZoom == null) return;
+                            zoom = zoom >= maxZoom! ? minZoom! : zoom + 1;
+                            await controller?.setZoomLevel(zoom);
+                            setState(() {});
+                          },
+                          child: Text('zoom: $zoom'),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(8),
+                        child: Text('MaxZoom: $maxZoom & MinZoom: $minZoom'),
+                      )
+                    ],
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -152,7 +177,10 @@ class _QRViewExampleState extends State<QRViewExample> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
+  void _onQRViewCreated(QRViewController controller) async {
+    minZoom = await controller.getMinZoomLevel();
+    maxZoom = await controller.getMaxZoomLevel();
+    print('min and max is $minZoom, $maxZoom');
     setState(() {
       this.controller = controller;
     });

@@ -212,13 +212,17 @@ class QRViewController {
 
   bool _hasPermissions = false;
   bool get hasPermissions => _hasPermissions;
+  double? _maxZoom;
+  double? _minZoom;
 
   /// Starts the barcode scanner
   Future<void> _startScan(GlobalKey key, QrScannerOverlayShape? overlay, List<BarcodeFormat>? barcodeFormats) async {
     // We need to update the dimension before the scan is started.
     try {
       await QRViewController.updateDimensions(key, _channel, overlay: overlay);
-      return await _channel.invokeMethod('startScan', barcodeFormats?.map((e) => e.asInt()).toList() ?? []);
+      await _channel.invokeMethod('startScan', barcodeFormats?.map((e) => e.asInt()).toList() ?? []);
+      getMaxZoomLevel();
+      getMinZoomLevel();
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }
@@ -237,12 +241,18 @@ class QRViewController {
 
   /// Get Max zoom level of the camera
   Future<double> getMaxZoomLevel() async {
-    return await _channel.invokeMethod('getMaxZoom') as double;
+    if (_maxZoom != null) return _maxZoom!;
+    await Future.delayed(const Duration(milliseconds: 500));
+    _maxZoom = await _channel.invokeMethod('getMaxZoom') as double?;
+    return _maxZoom ?? await getMaxZoomLevel();
   }
 
   /// Get Min zoom level of the camera
   Future<double> getMinZoomLevel() async {
-    return await _channel.invokeMethod('getMinZoom') as double;
+    if (_minZoom != null) return _minZoom!;
+    await Future.delayed(const Duration(milliseconds: 500));
+    _minZoom = await _channel.invokeMethod('getMinZoom') as double?;
+    return _minZoom ?? await getMinZoomLevel();
   }
 
   /// Get zoom level of the camera
