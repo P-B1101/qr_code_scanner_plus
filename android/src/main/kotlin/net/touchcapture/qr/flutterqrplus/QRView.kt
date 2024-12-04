@@ -130,7 +130,7 @@ class QRView(
             if (params[PARAMS_CAMERA_FACING] as Int == 1) {
                 barcodeView.cameraSettings?.requestedCameraId = cameraFacingFront
             }
-            barcodeView.setZoomLevel(1.0f)
+            barcodeView.setZoomLevel(1.0)
         } else if (!isPaused) {
             barcodeView.resume()
         }
