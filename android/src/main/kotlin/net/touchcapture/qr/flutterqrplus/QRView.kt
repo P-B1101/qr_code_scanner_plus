@@ -110,7 +110,7 @@ class QRView(
 
             "setZoomLevel" -> setZoomLevel(
                 result,
-                zoomLevel = call.argument<Float>("zoomLevel") ?: 1.0f
+                zoomLevel = call.argument<Double>("zoomLevel") ?: 1.0
             )
 
             else -> result.notImplemented()
@@ -195,9 +195,9 @@ class QRView(
         result.success(barcodeView.maxZoomLevel)
     }
 
-    private fun setZoomLevel(result: MethodChannel.Result, zoomLevel: Float) {
+    private fun setZoomLevel(result: MethodChannel.Result, zoomLevel: Double) {
         val barcodeView = barcodeView ?: return barCodeViewNotSet(result)
-        barcodeView.setZoomLevel(zoomLevel)
+        barcodeView.setZoomLevel(zoomLevel.toFloat())
         result.success(true)
     }
 
