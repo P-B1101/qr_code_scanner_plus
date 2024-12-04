@@ -108,7 +108,10 @@ class QRView(
 
             "getMaxZoom" -> getMaxZoom(result)
 
-            "setZoomLevel" -> setZoomLevel(result, zoomLevel = call.argument<Float>("zoomLevel")?: 1.0f)
+            "setZoomLevel" -> setZoomLevel(
+                result,
+                zoomLevel = call.argument<Float>("zoomLevel") ?: 1.0f
+            )
 
             else -> result.notImplemented()
         }
@@ -127,6 +130,7 @@ class QRView(
             if (params[PARAMS_CAMERA_FACING] as Int == 1) {
                 barcodeView.cameraSettings?.requestedCameraId = cameraFacingFront
             }
+            barcodeView.setZoomLevel(1.0f)
         } else if (!isPaused) {
             barcodeView.resume()
         }
